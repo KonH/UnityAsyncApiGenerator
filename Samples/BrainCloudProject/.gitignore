@@ -1,0 +1,13 @@
+Library
+Temp
+Logs
+obj
+.idea
+
+# Sensitive data
+Assets/BrainCloud/Resources
+Assets/BrainCloud/Resources.meta
+
+*.csproj
+*.sln
+.DS_Store

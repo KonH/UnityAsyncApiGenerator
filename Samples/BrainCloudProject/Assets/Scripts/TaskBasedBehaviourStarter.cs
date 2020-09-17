@@ -133,7 +133,7 @@ namespace Scripts {
 
 		async Task UpdateLocalEntity() {
 			var data = JsonMapper.ToJson(_localEntity.data);
-			var response = await _wrapper.EntityService.UpdateSingletonAsync("local_key", data, null, 1);
+			var response = await _wrapper.EntityService.UpdateSingletonAsync("local_key", data, null, _localEntity.version);
 			Debug.Log(response);
 			var responseData = JsonMapper.ToObject<EntityResponse>(response);
 			_localEntity = new EntityHolder {

@@ -9,20 +9,35 @@ namespace Scripts {
 			string username,
 			string password,
 			bool forceCreate) {
-			throw new NotImplementedException();
+			var tcs = new TaskCompletionSource<string>();
+			self.AuthenticateUniversal(
+				username, password, forceCreate,
+				(response, _) => tcs.SetResult(response),
+				(status, code, error, cbObject) => tcs.SetException(new Exception(error)));
+			return tcs.Task;
 		}
 
 		public static Task<string> GetListByIndexedIdAsync(
 			this BrainCloudGlobalEntity self,
 			string entityIndexedId,
 			int maxReturn) {
-			throw new NotImplementedException();
+			var tcs = new TaskCompletionSource<string>();
+			self.GetListByIndexedId(
+				entityIndexedId, maxReturn,
+				(response, _) => tcs.SetResult(response),
+				(status, code, error, cbObject) => tcs.SetException(new Exception(error)));
+			return tcs.Task;
 		}
 
 		public static Task<string> GetSingletonAsync(
 			this BrainCloudEntity self,
 			string entityType) {
-			throw new NotImplementedException();
+			var tcs = new TaskCompletionSource<string>();
+			self.GetSingleton(
+				entityType,
+				(response, _) => tcs.SetResult(response),
+				(status, code, error, cbObject) => tcs.SetException(new Exception(error)));
+			return tcs.Task;
 		}
 
 		public static Task<string> CreateEntityWithIndexedIdAsync(
@@ -32,7 +47,12 @@ namespace Scripts {
 			long timeToLive,
 			string jsonEntityAcl,
 			string jsonEntityData) {
-			throw new NotImplementedException();
+			var tcs = new TaskCompletionSource<string>();
+			self.CreateEntityWithIndexedId(
+				entityType, indexedId, timeToLive, jsonEntityAcl, jsonEntityData,
+				(response, _) => tcs.SetResult(response),
+				(status, code, error, cbObject) => tcs.SetException(new Exception(error)));
+			return tcs.Task;
 		}
 
 		public static Task<string> UpdateSingletonAsync(
@@ -41,7 +61,12 @@ namespace Scripts {
 			string jsonEntityData,
 			string jsonEntityAcl,
 			int version) {
-			throw new NotImplementedException();
+			var tcs = new TaskCompletionSource<string>();
+			self.UpdateSingleton(
+				entityType, jsonEntityData, jsonEntityAcl, version,
+				(response, _) => tcs.SetResult(response),
+				(status, code, error, cbObject) => tcs.SetException(new Exception(error)));
+			return tcs.Task;
 		}
 
 		public static Task<string> UpdateEntityAsync(
@@ -49,7 +74,12 @@ namespace Scripts {
 			string entityId,
 			int version,
 			string jsonEntityData) {
-			throw new NotImplementedException();
+			var tcs = new TaskCompletionSource<string>();
+			self.UpdateEntity(
+				entityId, version, jsonEntityData,
+				(response, _) => tcs.SetResult(response),
+				(status, code, error, cbObject) => tcs.SetException(new Exception(error)));
+			return tcs.Task;
 		}
 	}
 }

@@ -55,11 +55,18 @@ namespace Scripts.Editor {
 			}
 
 			static string FormatParams(ParamInfo[] parameters) {
-				return string.Join(", ", parameters.Select(p => $"{p.Type.Name} {p.Name}"));
+				return string.Join(", ", parameters.Select(p => $"{GetTypeName(p.Type)} {p.Name}"));
 			}
 
 			static string FormatParamNamesOnly(ParamInfo[] parameters) {
 				return string.Join(", ", parameters.Select(p => p.Name));
+			}
+
+			static string GetTypeName(Type type) {
+				if ( type.IsNested ) {
+					return $"{type.DeclaringType?.Name}.{type.Name}";
+				}
+				return type.Name;
 			}
 
 			static ParamInfo[] GetCleanParams(ParamInfo[] parameters) {
@@ -85,7 +92,6 @@ namespace Scripts.Editor {
 					.Where(m => m.GetParameters().Any(p => p.ParameterType == typeof(SuccessCallback)))
 					.Where(m => m.GetParameters().Any(p => p.ParameterType == typeof(FailureCallback)))
 					.Where(m => !m.GetParameters().Any(p => p.ParameterType.IsGenericType))
-					.Where(m => !m.GetParameters().Any(p => p.ParameterType.IsNested))
 					.ToArray();
 			}
 		}

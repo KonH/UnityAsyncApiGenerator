@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using BrainCloud.LitJson;
+using Scripts.Extensions;
+using Scripts.Extensions.BrainCloud;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

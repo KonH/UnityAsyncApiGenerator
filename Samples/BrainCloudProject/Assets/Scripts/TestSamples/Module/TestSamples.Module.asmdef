@@ -1,0 +1,15 @@
+{
+    "name": "TestSamples.Module",
+    "references": [
+        "GUID:6dbc0870d3e974276ba2ab6375e34747"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

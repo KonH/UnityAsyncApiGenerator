@@ -117,7 +117,7 @@ namespace Scripts.Editor {
 			public Type[] GetTypes() {
 				var assembly = Assembly.GetAssembly(typeof(BrainCloudWrapper));
 				return assembly.GetTypes()
-					.Where(t => !string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("BrainCloud") && t.IsPublic)
+					.Where(t => t == typeof(BrainCloudWrapper) || !string.IsNullOrEmpty(t.Namespace) && t.Namespace.StartsWith("BrainCloud") && t.IsPublic)
 					.ToArray();
 			}
 		}
@@ -151,7 +151,7 @@ namespace Scripts.Editor {
 				if ( !Directory.Exists(dirPath) ) {
 					Directory.CreateDirectory(dirPath);
 				}
-				var extensionNamespace = $"Scripts.Extensions.{type.Namespace}";
+				var extensionNamespace = $"Scripts.Extensions{(!string.IsNullOrEmpty(type.Namespace) ? "." : "")}{type.Namespace}";
 				var extensionBodies    = extensions.Select(e => _formatter.FormatMethod(e)).ToArray();
 				var body               = _formatter.FormatBody(extensionBodies);
 				var useNamespaces      = extensions.SelectMany(e => e.AllTypes).Select(t => t.Namespace).Distinct().Where(ns => !string.IsNullOrWhiteSpace(ns)).ToArray();

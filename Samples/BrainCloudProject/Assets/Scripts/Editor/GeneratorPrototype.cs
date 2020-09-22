@@ -28,7 +28,7 @@ namespace Scripts.Editor {
 			public string      ReturnTypeName              => ReturnType.Name;
 			public string      TargetTypeName              => TargetType.Name;
 			public string      CleanTargetCallParamsLine   => FormatParamNamesOnly(CleanParams);
-			public string      Name                        => $"{TargetMethodName}Async";
+			public string      Name                        => GetName();
 			public ParamInfo[] CleanParams                 => GetCleanParams(TargetParams);
 			public string      CleanTargetParamsLine       => FormatParams(CleanParams);
 			public string      SuccessCallbackParamsLine   => "response, cbObject";
@@ -38,11 +38,32 @@ namespace Scripts.Editor {
 			public string      ExceptionTypeName           => ExceptionType.Name;
 			public string      ExceptionSelector           => "error";
 			public Type[]      AllTypes                    => CollectTypes();
+			public int         GenericArgumentCount        => GetGenericArgumentCount();
 
-			public ExtensionInfo(Type targetType, string targetMethodName, ParamInfo[] targetParams) {
+			public ExtensionInfo(Type targetType, MethodInfo targetMethod, ParamInfo[] targetParams) {
 				TargetType       = targetType;
-				TargetMethodName = targetMethodName;
+				TargetMethodName = GetMethodName(targetMethod);
 				TargetParams     = targetParams;
+			}
+
+			static string GetMethodName(MethodInfo method) {
+				var baseName = method.Name;
+				if ( !method.IsGenericMethod ) {
+					return baseName;
+				}
+				return $"{baseName}<{GetTypeArguments(method.GetGenericArguments().Length)}>";
+			}
+
+			string GetName() {
+				var baseName = $"{TargetMethodName}Async";
+				if ( GenericArgumentCount == 0 ) {
+					return baseName;
+				}
+				return $"{baseName}<{GetTypeArguments(GenericArgumentCount)}>";
+			}
+
+			static string GetTypeArguments(int count) {
+				return string.Join(", ", Enumerable.Range(1, count).Select(i => $"T{i}"));
 			}
 
 			Type[] CollectTypes() {
@@ -52,6 +73,10 @@ namespace Scripts.Editor {
 				};
 				result.AddRange(CleanParams.Select(p => p.Type));
 				return result.ToArray();
+			}
+
+			int GetGenericArgumentCount() {
+				return (CleanParams.Length > 0) ? CleanParams.Max(p => p.Type.GetGenericArguments().Length) : 0;
 			}
 
 			static string FormatParams(ParamInfo[] parameters) {
@@ -65,6 +90,18 @@ namespace Scripts.Editor {
 			static string GetTypeName(Type type) {
 				if ( type.IsNested ) {
 					return $"{type.DeclaringType?.Name}.{type.Name}";
+				}
+				if ( type.IsGenericTypeDefinition ) {
+					var rawName  = type.Name.Split('`')[0];
+					var typeArgs = GetTypeArguments(type.GetGenericArguments().Length);
+					var name     = $"{rawName}<{typeArgs}>";
+					return name;
+				}
+				if ( type.IsGenericType ) {
+					var rawName  = type.Name.Split('`')[0];
+					var typeArgs = string.Join(", ", type.GetGenericArguments().Select(GetTypeName));
+					var name     = $"{rawName}<{typeArgs}>";
+					return name;
 				}
 				return type.Name;
 			}
@@ -91,7 +128,6 @@ namespace Scripts.Editor {
 					.Where(m => m.ReturnType == typeof(void))
 					.Where(m => m.GetParameters().Any(p => p.ParameterType == typeof(SuccessCallback)))
 					.Where(m => m.GetParameters().Any(p => p.ParameterType == typeof(FailureCallback)))
-					.Where(m => !m.GetParameters().Any(p => p.ParameterType.IsGenericType))
 					.ToArray();
 			}
 		}
@@ -202,7 +238,7 @@ namespace Scripts.Editor {
 			ExtensionInfo CreateExtension(MethodInfo method) {
 				var targetType = method.DeclaringType;
 				var parameters = method.GetParameters().Select(p => new ParamInfo(p.ParameterType, p.Name)).ToArray();
-				return new ExtensionInfo(targetType, method.Name, parameters);
+				return new ExtensionInfo(targetType, method, parameters);
 			}
 		}
 
